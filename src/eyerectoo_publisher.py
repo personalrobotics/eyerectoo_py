@@ -11,7 +11,9 @@ def parse_journal_data(journal_data):
 
     # TODO: Should remember in an elegant way which fields are at
     # which index, not have magic numbers like this.
-    outmsg.sync_timestamp = journal_data[0]
+
+    # Split off the "J"
+    outmsg.sync_timestamp =  int(journal_data[0][1:])
 
     # TODO: Rest of journal fields once we have sync_timestap working.
 
