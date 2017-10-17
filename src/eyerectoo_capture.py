@@ -19,7 +19,4 @@ class EyeRecTooCapture():
         data, addr = self.socket.recvfrom(8192)
         data = data
         return data.split()
-
-
-test_capture = EyeRecTooCapture()
         
