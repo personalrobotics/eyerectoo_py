@@ -56,7 +56,7 @@ def parse_journal_data(journal_data):
 if __name__ == "__main__":
 
     # Create publisher for Journal data from EyeRecToo
-    pub_journal = rospy.Publisher('/eyerectoo_journal', Journal, queue_size=10)
+    pub_journal = rospy.Publisher('eyerectoo_journal', Journal, queue_size=10)
 
     rospy.loginfo("Starting EyeRecToo journal publisher.")
     print "Starting EyeRecToo journal publisher."
