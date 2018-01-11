@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import csv
 import time
+import sys
 
 from eyerectoo_capture import EyeRecTooCapture
 
@@ -38,20 +39,22 @@ def parse_journal_data(journal_data):
     aruco_Y_vals = []
     if aruco_markers_present:
         aruco_string = journal_data[13]
-        aruco_parts = aruco_string.split(";")
+        # There's an extra semicolon at the end for some reason.
+        aruco_parts = aruco_string.split(';')[:-1]
         for tag_data in aruco_parts:
-            tag_ID, tag_coords_str = tag_data.split(":")
-            tag_x, tag_y, _ = tag_coords_str.split("x")
+            tag_ID, tag_coords_str = tag_data.split(':')
+            tag_x, tag_y, _ = tag_coords_str.split('x')
             aruco_IDs.append(tag_ID)
             aruco_X_vals.append(tag_x)
             aruco_Y_vals.append(tag_y)
 
+
         # Remove the aruco marker data to make indicies consistent
         journal_data = journal_data[:13] + journal_data[14:]
 
-        aruco_IDs = ";".join(aruco_IDs)
-        aruco_X_vals = ";".join(aruco_X_vals)
-        aruco_Y_vals = ";".join(aruco_Y_vals)
+        aruco_IDs = ":".join(aruco_IDs)
+        aruco_X_vals = ":".join(aruco_X_vals)
+        aruco_Y_vals = ":".join(aruco_Y_vals)
 
         #pdb.set_trace()
 
@@ -131,20 +134,20 @@ if __name__ == "__main__":
     title_row.append("right_pupil_valid")
 
     with open(output_path, 'wb+') as csvfile:
-        gaze_data_writer = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-
+        gaze_data_writer = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
         gaze_data_writer.writerow(title_row)
 
-        # TODO: Wait for input here.
+        eyerectoo_listener = EyeRecTooCapture()
 
-        start_time = ctime()
+        raw_input("[INFO:] Press Enter to record gaze data for " + str(recording_time) + " seconds.")
+
+        start_time = time.clock()
         while (True):
             journal_data = eyerectoo_listener.read() 
             # Parse and write.
             new_csv_row = parse_journal_data(journal_data)
             gaze_data_writer.writerow(new_csv_row)
 
-            cur_time = ctime()
+            cur_time = time.clock()
             if cur_time - start_time > recording_time:
                 break
-
