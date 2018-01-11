@@ -141,13 +141,13 @@ if __name__ == "__main__":
 
         raw_input("[INFO:] Press Enter to record gaze data for " + str(recording_time) + " seconds.")
 
-        start_time = time.clock()
+        start_time = time.time()
         while (True):
             journal_data = eyerectoo_listener.read() 
             # Parse and write.
             new_csv_row = parse_journal_data(journal_data)
             gaze_data_writer.writerow(new_csv_row)
 
-            cur_time = time.clock()
+            cur_time = time.time()
             if cur_time - start_time > recording_time:
                 break
