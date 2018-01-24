@@ -16,6 +16,6 @@ if __name__ == "__main__":
         if (new_data_vector == None):
             break
 
-        stare_marker_id = stare_detector.check_if_staring(new_data_vector.timestamp, new_data_vector.gaze_x, new_data_vector.gaze_y, new_data_vector.aruco_IDs, new_data_vector.aruco_X_vals, new_data_vector.aruco_Y_vals)
+        stare_marker_id = stare_detector.check_if_staring(new_data_vector)
         if (stare_marker_id):
             print("STARING AT MARKER " + str(stare_marker_id))

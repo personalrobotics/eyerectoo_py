@@ -19,7 +19,15 @@ class StareDetector():
     # marker we think the user us staring at (or None if nothing is being
     # stared at currently).
     # NOTE: This is the only method that should really be considered "public".
-    def check_if_staring(self, timestep, gaze_x, gaze_y, aruco_IDs, aruco_X_vals, aruco_Y_vals):
+    def check_if_staring(self, data_vector):
+        # Extract fields from data vector.
+        timestep = data_vector.timestamp
+        gaze_x = data_vector.gaze_x
+        gaze_y = data_vector.gaze_y
+        aruco_IDs = data_vector.aruco_IDs
+        aruco_X_vals = data_vector.aruco_X_vals
+        aruco_Y_vals = data_vector.aruco_Y_vals
+
         # We're tracking something, so check if the current gaze is still within
         # radius of that.
         if self.tracking_ID:
