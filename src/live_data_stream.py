@@ -1,11 +1,13 @@
 import socket
 
-#EyeRecTpp defaults.
+#EyeRecToo defaults.
 IP_ADRESS = "255.255.255.255"
 PORT = 2002
 ADDR = (IP_ADRESS, PORT)
 
-class EyeRecTooCapture():
+# Listens for EyeRecToo data in real time and can be queried for a
+# GazeDataVector at each timestep.
+class LiveDataStream():
 
     def __init__(self, log=None):
         # setting UDP socket.
@@ -14,8 +16,6 @@ class EyeRecTooCapture():
         self.socket.bind(ADDR)
         self.logger = log
 
-
     def read(self):
-        data, addr = self.socket.recvfrom(8192)
-        data = data
-        return data.split()
+        data, _ = self.socket.recvfrom(8192)
+        return GazeDataVector(data)

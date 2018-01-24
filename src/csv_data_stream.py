@@ -3,6 +3,8 @@ from gaze_data_vector import GazeDataVector
 
 import pdb
 
+# Reads data from a CSV to "mimic" the data stream when getting live gaze data
+# from EyeRecToo.
 class CSVDataStream():
 
     def __init__(self, csv_filename):
