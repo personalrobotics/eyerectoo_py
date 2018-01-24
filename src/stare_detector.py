@@ -1,4 +1,4 @@
-from math import pow
+from math import pow, sqrt
 import pdb
 
 # Class that we can update with gaze data to detect when the user is staring at
