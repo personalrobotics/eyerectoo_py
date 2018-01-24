@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 import sys
+# Hack to make the next imports work.
+sys.path.append("../classes/")
 from csv_data_stream import CSVDataStream
+from stare_detector import StareDetector
 import pdb
 
 if __name__ == "__main__":

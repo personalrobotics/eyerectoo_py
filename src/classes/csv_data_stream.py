@@ -37,7 +37,7 @@ class CSVDataStream():
                 new_data_vector.aruco_IDs.append(int(string_id))
 
             marker_x_coord_string = self.csv_data["aruco_X_vals"][self.row_index]
-            for string_x_coord in marker_x_coord_string,split(":")
+            for string_x_coord in marker_x_coord_string.split(":"):
                 new_data_vector.aruco_X_vals.append(float(string_x_coord))
 
             marker_y_coord_string = self.csv_data["aruco_Y_vals"][self.row_index]

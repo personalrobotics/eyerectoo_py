@@ -32,7 +32,7 @@ class StareDetector():
         # radius of that.
         if self.tracking_ID:
             if self.check_maintain_stare(gaze_x, gaze_y, aruco_IDs, aruco_X_vals, aruco_Y_vals):
-                seconds_tracked = (timestep - self.tracking_timestep) * TIMESTAMP_TO_SECONDS
+                seconds_tracked = (timestep - self.tracking_timestep) * StareDetector.TIMESTAMP_TO_SECONDS
                 if (seconds_tracked >= self.activation_time):
                     # TODO: Should this be reset here?
                     self.tracking_ID = None
