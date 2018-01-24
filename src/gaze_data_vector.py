@@ -1,11 +1,15 @@
-#!/usr/bin/env python
 import pdb
 
 # Used to wrap a raw UDP packet from EyeRecToo and turns it into an object that
-# is *way* more human readable.
+# is *way* more human readable. Can also be set up as an empty struct and filled
+# in if UDP data is not given.
 class GazeDataVector():
 
-    def __init__(self, udp_string):
+    def __init__(self, udp_string=None):
+        if udp_string:
+            wrap_udp(udp_string)
+
+    def wrap_udp(udp_string):
         udp_fields = udp_string.split()
 
         # Split off the "J"

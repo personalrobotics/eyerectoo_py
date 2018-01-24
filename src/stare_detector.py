@@ -39,7 +39,6 @@ class StareDetector():
                 self.tracking_ID = new_tracking_ID
                 self.tracking_timestep = timestep
 
-
     # Check if the user's gaze is still within radius of the marker currently
     # being tracked.
     def check_maintain_stare(self, gaze_x, gaze_y, aruco_IDs, aruco_X_vals, aruco_Y_vals):
@@ -54,7 +53,6 @@ class StareDetector():
 
         return self.check_gaze_in_radius(gaze_x, gaze_y, current_marker_x, current_marker_y)
 
-
     # Of the markers detected by the headset, return the ID (if there is one) of
     # a marker the user's gaze is currently within radius of. We will then start
     # tracking that marker.
@@ -65,7 +63,6 @@ class StareDetector():
                 return potential_ID
 
         return None
-
 
     # Simply checks if gaze coordinate is within radius of a marker location.
     def check_gaze_in_radius(self, gaze_x, gaze_y, aruco_x, aruco_y):
