@@ -1,3 +1,6 @@
+# TODO: This entire script needs to be redone since we handle data processing
+# in the Python layer now. 
+
 #!/usr/bin/env python
 from msgpack import loads
 import json
@@ -8,7 +11,7 @@ from eyerectoo_capture import EyeRecTooCapture
 import pdb
 
 def parse_journal_data(journal_data):
-    ''' Parse EyeRecToo Journal into a Journal message.'''  
+    ''' Parse EyeRecToo Journal into a Journal message.'''
     outmsg = Journal()
 
     # TODO: Should remember in an elegant way which fields are at
@@ -32,7 +35,7 @@ def parse_journal_data(journal_data):
         journal_data = journal_data[:13] + journal_data[14:]
         #pdb.set_trace()
 
-    
+
     outmsg.left_pupil_x = float(journal_data[15])
     outmsg.left_pupil_y = float(journal_data[16])
     outmsg.left_pupil_width = float(journal_data[17])
@@ -65,7 +68,7 @@ if __name__ == "__main__":
     eyerectoo_listener = EyeRecTooCapture()
 
     while not rospy.is_shutdown():
-        journal_data = eyerectoo_listener.read() 
+        journal_data = eyerectoo_listener.read()
 
         rospy.logdebug("Reading EyeRecToo journal")
         # Parse and publish
