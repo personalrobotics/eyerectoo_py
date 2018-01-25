@@ -5,9 +5,9 @@ import pdb
 # something.
 class StareDetector():
 
-    TIMESTAMP_TO_SECONDS = 1000
+    TIMESTAMP_TO_SECONDS = 1000.0
 
-    def __init__(self, trigger_radius=60.0, activation_time=5.0):
+    def __init__(self, trigger_radius=60.0, activation_time=3.0):
         # Not tracking anything at first.
         self.tracking_ID = None
         self.tracking_timestep = None
@@ -32,11 +32,8 @@ class StareDetector():
         # radius of that.
         if self.tracking_ID:
             if self.check_maintain_stare(gaze_x, gaze_y, aruco_IDs, aruco_X_vals, aruco_Y_vals):
-                seconds_tracked = (timestep - self.tracking_timestep) * StareDetector.TIMESTAMP_TO_SECONDS
+                seconds_tracked = (timestep - self.tracking_timestep) / StareDetector.TIMESTAMP_TO_SECONDS
                 if (seconds_tracked >= self.activation_time):
-                    # TODO: Should this be reset here?
-                    self.tracking_ID = None
-                    self.tracking_timestep = None
                     return self.tracking_ID
             else:
                 self.tracking_ID = None
