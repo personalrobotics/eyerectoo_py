@@ -1,3 +1,6 @@
+# in order to run:
+# python test_data_filter.py "../../filtering/recordings/morelle_clean_data.csv"
+
 #!/usr/bin/env python
 import sys
 # Hack to make the next imports work.
