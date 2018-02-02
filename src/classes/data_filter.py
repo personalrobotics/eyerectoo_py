@@ -27,23 +27,24 @@ class dataFilter() :
 		self.num_frames_erase = 10 # erase 10 frames at once for efficiency
 		self.frames_memory = 50 + self.num_frames_erase # remember only the last 50 values (up to 60)
 		self.gaze_vector = []
-		self.gaze_valid = []
+		# self.gaze_valid = [] # made gaze_valid a field in gaze_data_vector
 
 
-	def filter(self, new_gaze_vector) :
+	def set_gaze_valid_field(self, new_gaze_vector) :
 		# get a new frame
 		self.gaze_vector.append(new_gaze_vector)
 		# do the filtering on the new frame
 		frame_valid = self.filter_gaze_data_vector(new_gaze_vector)
-		self.gaze_valid.append(frame_valid)
+		# self.gaze_valid.append(frame_valid)
 
 		# if we've stored too many frames, let's remove some to maintain memory...
 		if (len(self.gaze_vector) > self.frames_memory) :
 			del self.gaze_vector[:self.num_frames_erase] # remove first n frames
-		if (len(self.gaze_valid) > self.frames_memory) :
-			del self.gaze_valid[:self.num_frames_erase] # remove first n frames
+		# if (len(self.gaze_valid) > self.frames_memory) :
+		# 	del self.gaze_valid[:self.num_frames_erase] # remove first n frames
 
-		return frame_valid
+		# return frame_valid
+		return self.gaze_vector[-1]
 
 
 	# do the filtering in here
@@ -53,7 +54,10 @@ class dataFilter() :
 			if len(self.gaze_vector) > 2 : # this filter only works with 2 data pts
 				if (self.filter_pupil_width_height(curr_gaze_vector)) :
 					return True
+					# return curr_gaze_vector
+		self.gaze_vector[-1].gaze_valid = False
 		return False
+		# return self.gaze_vector[-1]
 
 
 	# checks whether the gaze values are out of range of field width & height

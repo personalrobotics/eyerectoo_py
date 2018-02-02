@@ -51,3 +51,6 @@ class GazeDataVector():
         self.right_pupil_width = float(udp_fields[25])
         self.right_pupil_height = float(udp_fields[26])
         self.right_pupil_angle = float(udp_fields[27])
+        # now let's add another gaze validation field, initialize to True
+        self.gaze_valid = bool(True)
+        print("added gaze_valid")

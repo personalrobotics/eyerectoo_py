@@ -55,6 +55,7 @@ class CSVDataStream():
         new_data_vector.right_pupil_width = self.csv_data["right_pupil_width"][self.row_index]
         new_data_vector.right_pupil_height = self.csv_data["right_pupil_height"][self.row_index]
         new_data_vector.right_pupil_angle = self.csv_data["right_pupil_angle"][self.row_index]
+        new_data_vector.gaze_valid = True
 
         # Read the next row next time.
         self.row_index += 1

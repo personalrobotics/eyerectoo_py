@@ -26,10 +26,10 @@ if __name__ == "__main__":
         if (new_data_vector == None):
             break
         # otherwise, let's filter the data!
-        valid = filt.filter(new_data_vector)
-        valid_vector.append(valid)
+        filtered_data = filt.set_gaze_valid_field(new_data_vector)
+        valid_vector.append(filtered_data.gaze_valid)
 
-        if (valid) :
+        if (filtered_data.gaze_valid) :
             stare_marker_id = stare_detector.check_if_staring(new_data_vector)
             if (stare_marker_id):
                 print("STARING AT MARKER " + str(stare_marker_id))
