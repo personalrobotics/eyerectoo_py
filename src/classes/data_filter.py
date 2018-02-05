@@ -16,7 +16,7 @@ TODO:
 - get stare detector working
 """
 
-
+import numpy as np
 
 
 class dataFilter() :
@@ -28,6 +28,18 @@ class dataFilter() :
 		self.frames_memory = 50 + self.num_frames_erase # remember only the last 50 values (up to 60)
 		self.gaze_vector = []
 		# self.gaze_valid = [] # made gaze_valid a field in gaze_data_vector
+
+		self.min_window_size = 40 # for the pupil values
+		self.right_pupil_widths = [] # keep window of recent pupil values
+		self.right_pupil_heights = []
+		self.left_pupil_widths = []
+		self.left_pupil_heights = []
+
+		self.max_std = 20 # use windows that have max 20 pixel standard deviation for pupil size estimation
+		self.filtered_right_pupil_widths = [] # tuples of avg values and stdevs
+		self.filtered_right_pupil_heights = []
+		self.filtered_left_pupil_widths = []
+		self.filtered_left_pupil_heights = []
 
 
 	def set_gaze_valid_field(self, new_gaze_vector) :
@@ -52,7 +64,8 @@ class dataFilter() :
 		# each of these filtering functions returns a bool
 		if (self.filter_field_width_height(curr_gaze_vector)) :
 			if len(self.gaze_vector) > 2 : # this filter only works with 2 data pts
-				if (self.filter_pupil_width_height(curr_gaze_vector)) :
+				# if (self.filter_pupil_width_height(curr_gaze_vector)) :
+				if (self.filter_pupil_size(curr_gaze_vector)) :
 					return True
 					# return curr_gaze_vector
 		self.gaze_vector[-1].gaze_valid = False
@@ -72,8 +85,57 @@ class dataFilter() :
 		return valid_gaze
 
 
+	# filters pupil width/height based on a best guess of the real pupil size
+	# if we don't have enough data points for this method, use filter_pupil_width_height
+	def filter_pupil_size(self, curr_gaze_vector) :
+		if len(self.gaze_vector) >= self.min_window_size : # min 40 points to begin windowing data...
+			v1 = self.helper_filter_pupil_size(self.right_pupil_widths, self.filtered_right_pupil_widths, curr_gaze_vector.right_pupil_width)
+			v2 = self.helper_filter_pupil_size(self.right_pupil_heights, self.filtered_right_pupil_heights, curr_gaze_vector.right_pupil_height)
+			v3 = self.helper_filter_pupil_size(self.left_pupil_widths, self.filtered_left_pupil_widths, curr_gaze_vector.left_pupil_width)
+			v4 = self.helper_filter_pupil_size(self.left_pupil_widths, self.filtered_left_pupil_heights, curr_gaze_vector.left_pupil_height)
+
+			if (v1 and v2 and v3 and v4) :
+				return True
+			else :
+				return False
+
+		else : # we just don't have enough points...
+			return self.filter_pupil_width_height(curr_gaze_vector)
+
+
+	def helper_filter_pupil_size(self, pupil_vector, good_pupil_vals, curr_val) :
+		thresh = 20 # within 20 pixels of the pupil size we expect
+
+		# first add current value
+		pupil_vector.append(curr_val)
+
+		# calculate over window the avg and stdev
+		windowed_avg = np.mean(pupil_vector[-1*self.min_window_size:])
+		windowed_std = np.std(pupil_vector[-1*self.min_window_size:])
+		if (windowed_std <= self.max_std) :
+			good_pupil_vals.append([windowed_avg, windowed_std])
+
+		# let's manage some memory - don't want to store too too much
+		if (len(good_pupil_vals) > self.frames_memory) :
+			del good_pupil_vals[:self.num_frames_erase]
+
+		# if we have good values, use them to check current gaze vector
+		if (len(good_pupil_vals) > 0) :
+			# calculate the pupil value
+			# calculated_pupil_val = np.average(good_pupil_vals[:,0], weights=( np.asarray(good_pupil_vals)[:,1]) # use std as weights -- no bueno! should be HIGHER weights for lower stdevs
+			calculated_pupil_val = np.average(np.asarray(good_pupil_vals)[:,0])
+			if (curr_val < calculated_pupil_val + thresh) and (curr_val > calculated_pupil_val - thresh) :
+				return True
+			else :
+				return False
+		# else if we don't have any good values yet, use the old method...
+		else :
+			return filter_pupil_width_height(curr_gaze_vector)
+
+
+
+
 	# checks whether the pupil width/height have jumped in value beyond the threshold in the past frame
-### we should really do a better check here because we can find pupil size
 	# If the spike remains high, we just lose one data point
 	# If the spike goes back, we lose two data points but remove the dirty point
 	def filter_pupil_width_height(self, curr_gaze_vector) :
