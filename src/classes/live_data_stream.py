@@ -1,5 +1,7 @@
 import socket
 
+from gaze_data_vector import GazeDataVector
+
 #EyeRecToo defaults.
 IP_ADRESS = "255.255.255.255"
 PORT = 2002

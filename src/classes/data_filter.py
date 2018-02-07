@@ -147,10 +147,10 @@ class dataFilter() :
 	# if we don't have enough data points for this method, use filter_pupil_width_height
 	def filter_pupil_size(self, curr_gaze_vector) :
 		if len(self.gaze_vector) >= self.min_window_size : # min 40 points to begin windowing data...
-			v1 = self.helper_filter_pupil_size(self.right_pupil_widths, self.filtered_right_pupil_widths, curr_gaze_vector.right_pupil_width)
-			v2 = self.helper_filter_pupil_size(self.right_pupil_heights, self.filtered_right_pupil_heights, curr_gaze_vector.right_pupil_height)
-			v3 = self.helper_filter_pupil_size(self.left_pupil_widths, self.filtered_left_pupil_widths, curr_gaze_vector.left_pupil_width)
-			v4 = self.helper_filter_pupil_size(self.left_pupil_widths, self.filtered_left_pupil_heights, curr_gaze_vector.left_pupil_height)
+			v1 = self.helper_filter_pupil_size(self.right_pupil_widths, self.filtered_right_pupil_widths, curr_gaze_vector.right_pupil_width, curr_gaze_vector)
+			v2 = self.helper_filter_pupil_size(self.right_pupil_heights, self.filtered_right_pupil_heights, curr_gaze_vector.right_pupil_height, curr_gaze_vector)
+			v3 = self.helper_filter_pupil_size(self.left_pupil_widths, self.filtered_left_pupil_widths, curr_gaze_vector.left_pupil_width, curr_gaze_vector)
+			v4 = self.helper_filter_pupil_size(self.left_pupil_widths, self.filtered_left_pupil_heights, curr_gaze_vector.left_pupil_height, curr_gaze_vector)
 
 			if (v1 and v2 and v3 and v4) :
 				return True
@@ -161,7 +161,7 @@ class dataFilter() :
 			return self.filter_pupil_width_height(curr_gaze_vector)
 
 
-	def helper_filter_pupil_size(self, pupil_vector, good_pupil_vals, curr_val) :
+	def helper_filter_pupil_size(self, pupil_vector, good_pupil_vals, curr_val, curr_gaze_vector) :
 		thresh = 20 # within 20 pixels of the pupil size we expect
 
 		# first add current value
@@ -188,7 +188,7 @@ class dataFilter() :
 				return False
 		# else if we don't have any good values yet, use the old method...
 		else :
-			return filter_pupil_width_height(curr_gaze_vector)
+			return self.filter_pupil_width_height(curr_gaze_vector)
 
 
 

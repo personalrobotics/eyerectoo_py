@@ -7,9 +7,9 @@ class GazeDataVector():
 
     def __init__(self, udp_string=None):
         if udp_string:
-            wrap_udp(udp_string)
+            self.wrap_udp(udp_string)
 
-    def wrap_udp(udp_string):
+    def wrap_udp(self, udp_string):
         udp_fields = udp_string.split()
 
         # Split off the "J"
@@ -33,9 +33,9 @@ class GazeDataVector():
             for tag_data in aruco_parts:
                 tag_ID, tag_coords_str = tag_data.split(':')
                 tag_x, tag_y, _ = tag_coords_str.split('x')
-                self.aruco_IDs.append(tag_ID)
-                self.aruco_X_vals.append(tag_x)
-                self.aruco_Y_vals.append(tag_y)
+                self.aruco_IDs.append(int(tag_ID))
+                self.aruco_X_vals.append(float(tag_x))
+                self.aruco_Y_vals.append(float(tag_y))
 
             # Remove the aruco marker data to make next indicies consistent
             udp_fields = udp_fields[:13] + udp_fields[14:]
@@ -53,4 +53,4 @@ class GazeDataVector():
         self.right_pupil_angle = float(udp_fields[27])
         # now let's add another gaze validation field, initialize to True
         self.gaze_valid = bool(True)
-        print("added gaze_valid")
+        #print("added gaze_valid")
