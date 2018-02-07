@@ -19,12 +19,15 @@ if __name__ == "__main__":
     filt = dataFilter()
     stare_detector = StareDetector()
     valid_vector = []
+    aruco_arr = {}
 
     while (True):
         new_data_vector = data_stream.read()
         # Data stream will return None when reading past end of CSV.
         if (new_data_vector == None):
             break
+
+
         # otherwise, let's filter the data!
         filtered_data = filt.set_gaze_valid_field(new_data_vector)
         valid_vector.append(filtered_data.gaze_valid)

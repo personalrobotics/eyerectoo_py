@@ -17,6 +17,8 @@ TODO:
 """
 
 import numpy as np
+# from scipy.interpolate import interp1d
+import pandas
 
 
 class dataFilter() :
@@ -41,6 +43,11 @@ class dataFilter() :
 		self.filtered_left_pupil_widths = []
 		self.filtered_left_pupil_heights = []
 
+		# aruco filtering data
+		# save dictionary of 'arudo_id': [[x0,y0], [x1,y1]]
+		# values in the array that are missing are filled with nan
+		self.aruco_arr = {}
+
 
 	def set_gaze_valid_field(self, new_gaze_vector) :
 		# get a new frame
@@ -48,6 +55,8 @@ class dataFilter() :
 		# do the filtering on the new frame
 		frame_valid = self.filter_gaze_data_vector(new_gaze_vector)
 		# self.gaze_valid.append(frame_valid)
+
+		self.filter_aruco_values(new_gaze_vector)
 
 		# if we've stored too many frames, let's remove some to maintain memory...
 		if (len(self.gaze_vector) > self.frames_memory) :
@@ -59,7 +68,56 @@ class dataFilter() :
 		return self.gaze_vector[-1]
 
 
-	# do the filtering in here
+	# filter the aruco markers
+	def filter_aruco_values(self, new_gaze_vector) :
+		# loop through all aruco ids
+		for i in self.aruco_arr :
+			# for all the ids in last frame
+			# for i in len(new_gaze_vector.aruco_IDs) :
+			if i in new_gaze_vector.aruco_IDs :
+				index = new_gaze_vector.aruco_IDs.index(i)
+				self.aruco_arr[i].append([new_gaze_vector.aruco_X_vals[index], new_gaze_vector.aruco_Y_vals[index]])
+
+			# for all those not present in last frame
+			else :
+				# append an empty value to the aruco field
+				# self.aruco_arr[i].append([float('nan'), float('nan')])
+				self.aruco_arr[i].append([np.nan, np.nan])
+
+		for i in range(len(new_gaze_vector.aruco_IDs)) :
+			if new_gaze_vector.aruco_IDs[i] not in self.aruco_arr :
+				# add it
+				self.aruco_arr[new_gaze_vector.aruco_IDs[i]] = [[new_gaze_vector.aruco_X_vals[i], new_gaze_vector.aruco_Y_vals[i]]]
+
+
+		# now we filter the aruco IDs... smooth the nan's... if we have a data point sufficiently recently.
+		for i in self.aruco_arr :
+			arr0 = pandas.Series(np.asarray(self.aruco_arr[i])[:,0])
+			arr1 = pandas.Series(np.asarray(self.aruco_arr[i])[:,1])
+			# perform 2d interpolation on the value
+			try :
+				arr0 = arr0.interpolate() # there may be a better function than pandas interpolate... this treats each column separately... which is ALRIGHT
+				arr1 = arr1.interpolate()
+			except TypeError :
+				# aruco really isn't showing up in frame (or is being recognized poorly enough that we shouldn't deal with it)
+				return
+			# print(arr.iloc[-1])
+			# print(self.aruco_arr[i][-1])
+			if arr0.iloc[-1] != self.aruco_arr[i][-1][0] :
+				# if it's not equal in 0, also should not be equal in 1... (because nans should come in pairs)
+				# print("we interpolated something!")
+				# add index in aruco_IDs
+				new_gaze_vector.aruco_IDs.append(i)
+				new_gaze_vector.aruco_X_vals.append(arr0.iloc[-1])
+				new_gaze_vector.aruco_Y_vals.append(arr1.iloc[-1])
+
+		# we should probably also make sure we're not using too much memory...
+		for i in self.aruco_arr :
+			if len(self.aruco_arr[i]) > self.frames_memory :
+				del self.aruco_arr[i][:self.num_frames_erase]
+
+
+	# do the gaze filtering in here
 	def filter_gaze_data_vector(self, curr_gaze_vector) :
 		# each of these filtering functions returns a bool
 		if (self.filter_field_width_height(curr_gaze_vector)) :

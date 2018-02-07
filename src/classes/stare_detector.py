@@ -7,7 +7,7 @@ class StareDetector():
 
     TIMESTAMP_TO_SECONDS = 1000.0
 
-    def __init__(self, trigger_radius=60.0, activation_time=3.0):
+    def __init__(self, trigger_radius=100.0, activation_time=3.0):
         # Not tracking anything at first.
         self.tracking_ID = None
         self.tracking_timestep = None
@@ -33,6 +33,7 @@ class StareDetector():
         if self.tracking_ID:
             if self.check_maintain_stare(gaze_x, gaze_y, aruco_IDs, aruco_X_vals, aruco_Y_vals):
                 seconds_tracked = (timestep - self.tracking_timestep) / StareDetector.TIMESTAMP_TO_SECONDS
+                print(seconds_tracked)
                 if (seconds_tracked >= self.activation_time):
                     return self.tracking_ID
             else:
