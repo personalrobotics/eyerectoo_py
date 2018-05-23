@@ -36,5 +36,5 @@ if __name__ == "__main__":
                 print("STARING AT MARKER " + str(stare_marker_id))
 
     print(str(len(valid_vector) - sum(valid_vector)) + " points thrown out out of " + str(len(valid_vector)))
-    pyplot.plot(valid_vector)
-    pyplot.show()
+    #pyplot.plot(valid_vector)
+    #pyplot.show()

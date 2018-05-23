@@ -121,11 +121,12 @@ class dataFilter() :
 	def filter_gaze_data_vector(self, curr_gaze_vector) :
 		# each of these filtering functions returns a bool
 		if (self.filter_field_width_height(curr_gaze_vector)) :
-			if len(self.gaze_vector) > 2 : # this filter only works with 2 data pts
-				# if (self.filter_pupil_width_height(curr_gaze_vector)) :
-				if (self.filter_pupil_size(curr_gaze_vector)) :
-					return True
-					# return curr_gaze_vector
+			if self.filter_blinks(curr_gaze_vector) :
+				if len(self.gaze_vector) > 2 : # this filter only works with 2 data pts
+					# if (self.filter_pupil_width_height(curr_gaze_vector)) :
+					if (self.filter_pupil_size(curr_gaze_vector)) :
+						return True
+						# return curr_gaze_vector
 		self.gaze_vector[-1].gaze_valid = False
 		return False
 		# return self.gaze_vector[-1]
