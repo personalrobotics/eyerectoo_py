@@ -8,21 +8,27 @@ from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 
+# YOLO imports.
+import os
+sys.path.append("/home/sniyaz/my-workspace/src/darknet/python")
+import darknet
+
 class image_reader:
 
   def __init__(self):
     self.bridge = CvBridge()
     self.image_sub = rospy.Subscriber("EyeRecTooImage",Image,self.callback)
 
+    # Load Darknet for YOLO.
+    os.chdir("/home/sniyaz/my-workspace/src/darknet")
+    net = darknet.load_net("/home/sniyaz/my-workspace/src/darknet/cfg/yolov3-tiny.cfg", "/home/sniyaz/my-workspace/src/darknet/weights/yolov3-tiny.weights", 0)
+    meta = darknet.load_meta("/home/sniyaz/my-workspace/src/darknet/cfg/coco.data")
+
   def callback(self,data):
     try:
       cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
     except CvBridgeError as e:
       print(e)
-
-    (rows,cols,channels) = cv_image.shape
-    if cols > 60 and rows > 60 :
-      cv2.circle(cv_image, (50,50), 10, 255)
 
     cv2.imshow("Image window", cv_image)
     cv2.waitKey(3)
