@@ -35,8 +35,22 @@ class image_reader:
     # Save to temp file so we can convert to YOLO format.
     scratch_path = "/home/sniyaz/my-workspace/src/darknet/temp.jpg"
     cv2.imwrite(scratch_path, cv_image)
-    r = darknet.detect(self.net, self.meta, scratch_path)
-    print(r)
+    all_detections = darknet.detect(self.net, self.meta, scratch_path)
+
+    # Draw the detections for the user to see.
+    for detection in all_detections:
+        center_x = detection[2][0]
+        center_y = detection[2][1]
+
+        bb_width = detection[2][2]
+        bb_hieght = detection[2][3]
+
+        bb_upper_left = (int(center_x - (bb_width/2)), int(center_y - (bb_hieght/2)))
+        bb_lower_right = (int(center_x + (bb_width/2)), int(center_y + (bb_hieght/2)))
+
+        cv2.rectangle(cv_image, bb_upper_left, bb_lower_right, (0,0,255), 2)
+
+
 
     cv2.imshow("Image window", cv_image)
     cv2.waitKey(3)
