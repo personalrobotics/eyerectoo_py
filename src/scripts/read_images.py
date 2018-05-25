@@ -12,6 +12,7 @@ from cv_bridge import CvBridge, CvBridgeError
 sys.path.append("../classes/")
 from live_data_stream import LiveDataStream
 from stare_detector_cv import StareDetectorCV
+from data_filter import dataFilter
 
 # YOLO imports.
 import os
@@ -29,6 +30,7 @@ class image_reader:
     # Read data vectors from ER2.
     self.data_stream = LiveDataStream()
     self.stare_detector = StareDetectorCV();
+    self.data_filter = dataFilter()
 
     # Load Darknet for YOLO.
     os.chdir("/home/sniyaz/my-workspace/src/darknet")
@@ -41,16 +43,21 @@ class image_reader:
     except CvBridgeError as e:
       print(e)
 
+    # Read from the ER2 data stream.
+    # TODO: Detect Stare.
+    data_vector = self.data_stream.read()
+    filtered_data = self.data_filter.set_gaze_valid_field(data_vector)
+    # Ignore this timestep if the gaze data is dirty.
+    if not filtered_data.gaze_valid:
+        return
+
+    gaze_x = data_vector.gaze_x
+    gaze_y = data_vector.gaze_y
+
     # Save to temp file so we can convert to YOLO format.
     scratch_path = "/home/sniyaz/my-workspace/src/darknet/temp.jpg"
     cv2.imwrite(scratch_path, cv_image)
     all_detections = darknet.detect(self.net, self.meta, scratch_path)
-
-    # Read from the ER2 data stream.
-    # TODO: Detect Stare.
-    data_vector = self.data_stream.read()
-    gaze_x = data_vector.gaze_x
-    gaze_y = data_vector.gaze_y
 
     # Draw the user's predicted gaze on screen as a filled circle.
     cv2.circle(cv_image, (int(gaze_x), int(gaze_y)), 15, (0,0,255), -1)

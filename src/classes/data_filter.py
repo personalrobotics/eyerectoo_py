@@ -56,7 +56,9 @@ class dataFilter() :
 		frame_valid = self.filter_gaze_data_vector(new_gaze_vector)
 		# self.gaze_valid.append(frame_valid)
 
-		self.filter_aruco_values(new_gaze_vector)
+		# TODO: Handle more elegantly. On the CV branch, there is no ARUCO data
+		# to filter.
+		#self.filter_aruco_values(new_gaze_vector)
 
 		# if we've stored too many frames, let's remove some to maintain memory...
 		if (len(self.gaze_vector) > self.frames_memory) :
@@ -123,8 +125,11 @@ class dataFilter() :
 		if (self.filter_field_width_height(curr_gaze_vector)) :
 			if self.filter_blinks(curr_gaze_vector) :
 				if len(self.gaze_vector) > 2 : # this filter only works with 2 data pts
-					# if (self.filter_pupil_width_height(curr_gaze_vector)) :
-					if (self.filter_pupil_size(curr_gaze_vector)) :
+					# NOTE: I turned off the more advanced pupil size filtering.
+					# Maybe try it later?
+					if (self.filter_pupil_width_height(curr_gaze_vector)) :
+					#if (self.filter_pupil_size(curr_gaze_vector)) :
+						self.gaze_vector[-1].gaze_valid = True
 						return True
 						# return curr_gaze_vector
 		self.gaze_vector[-1].gaze_valid = False
