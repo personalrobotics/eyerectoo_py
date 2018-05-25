@@ -7,12 +7,15 @@ class StareDetectorCV():
 
     TIMESTAMP_TO_SECONDS = 1000.0
 
-    def __init__(self, activation_time=3.0):
+    def __init__(self, activation_time=3.0, bb_persistance_iterations=10):
         # Not tracking anything at first.
         self.tracking_ID = None
         self.tracking_timestep = None
         # Parameters of stare detection.
         self.activation_time = activation_time
+        self.bb_persistance_iterations = bb_persistance_iterations
+        self.elapsed_persistance_iterations = 0
+
 
     # Update state with gaze data and object detections at a new timestep.
     # Return the name of the object we think the user is staring at (or None if
@@ -47,12 +50,18 @@ class StareDetectorCV():
     def check_maintain_stare(self, gaze_x, gaze_y, detections):
         detected_objects = [i[0] for i in detections]
         if self.tracking_ID not in detected_objects:
-            # TODO: Sometimes the object drops off because of detection issues.
-            # Might want to think about what we should actually do here.
-            return False
-
-        tracked_object_index = detected_objects.index(self.tracking_ID)
-        tracked_object_data = detections[tracked_object_index]
+            # Add some persistance to the BB to account for intermittant
+            # detections.
+            self.elapsed_persistance_iterations += 1
+            if (self.elapsed_persistance_iterations == self.bb_persistance_iterations):
+                self.elapsed_persistance_iterations = 0
+                self.object_bb = None
+                return False
+            else:
+                tracked_object_data = (self.tracking_ID, 0.5, self.object_bb)
+        else:
+            tracked_object_index = detected_objects.index(self.tracking_ID)
+            tracked_object_data = detections[tracked_object_index]
 
         return self.check_gaze_intersection(gaze_x, gaze_y, tracked_object_data)
 
@@ -63,6 +72,7 @@ class StareDetectorCV():
         for cur_detection in detections:
             potential_object_name = cur_detection[0]
             if self.check_gaze_intersection(gaze_x, gaze_y, cur_detection):
+                self.object_bb = cur_detection[2]
                 return potential_object_name
 
         return None
