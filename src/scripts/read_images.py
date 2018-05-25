@@ -8,6 +8,10 @@ from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 
+# ER2 tools import.
+sys.path.append("../classes/")
+from live_data_stream import LiveDataStream
+
 # YOLO imports.
 import os
 sys.path.append("/home/sniyaz/my-workspace/src/darknet/python")
@@ -20,6 +24,9 @@ class image_reader:
   def __init__(self):
     self.bridge = CvBridge()
     self.image_sub = rospy.Subscriber("EyeRecTooImage",Image,self.callback)
+
+    # Read data vectors from ER2.
+    self.data_stream = LiveDataStream()
 
     # Load Darknet for YOLO.
     os.chdir("/home/sniyaz/my-workspace/src/darknet")
@@ -36,6 +43,10 @@ class image_reader:
     scratch_path = "/home/sniyaz/my-workspace/src/darknet/temp.jpg"
     cv2.imwrite(scratch_path, cv_image)
     all_detections = darknet.detect(self.net, self.meta, scratch_path)
+
+    # Read from the ER2 data stream.
+    # TODO: Detect Gaze.
+    data_vector = self.data_stream.read()
 
     # Draw the detections for the user to see.
     for detection in all_detections:
