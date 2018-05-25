@@ -28,7 +28,7 @@ class StareDetectorCV():
         # radius of that.
         if self.tracking_ID:
             if self.check_maintain_stare(gaze_x, gaze_y, detections):
-                seconds_tracked = (timestep - self.tracking_timestep) / StareDetector.TIMESTAMP_TO_SECONDS
+                seconds_tracked = (timestep - self.tracking_timestep) / StareDetectorCV.TIMESTAMP_TO_SECONDS
                 print(seconds_tracked)
                 if (seconds_tracked >= self.activation_time):
                     return self.tracking_ID

@@ -11,6 +11,7 @@ from cv_bridge import CvBridge, CvBridgeError
 # ER2 tools import.
 sys.path.append("../classes/")
 from live_data_stream import LiveDataStream
+from stare_detector_cv import StareDetectorCV
 
 # YOLO imports.
 import os
@@ -27,6 +28,7 @@ class image_reader:
 
     # Read data vectors from ER2.
     self.data_stream = LiveDataStream()
+    self.stare_detector = StareDetectorCV();
 
     # Load Darknet for YOLO.
     os.chdir("/home/sniyaz/my-workspace/src/darknet")
@@ -45,8 +47,16 @@ class image_reader:
     all_detections = darknet.detect(self.net, self.meta, scratch_path)
 
     # Read from the ER2 data stream.
-    # TODO: Detect Gaze.
+    # TODO: Detect Stare.
     data_vector = self.data_stream.read()
+    gaze_x = data_vector.gaze_x
+    gaze_y = data_vector.gaze_y
+
+    # Draw the user's predicted gaze on screen as a filled circle.
+    cv2.circle(cv_image, (int(gaze_x), int(gaze_y)), 15, (0,0,255), -1)
+    stare_object = self.stare_detector.check_if_staring(data_vector, all_detections)
+    if (stare_object):
+        print("STARING AT OBJECT " + str(stare_object))
 
     # Draw the detections for the user to see.
     for detection in all_detections:
